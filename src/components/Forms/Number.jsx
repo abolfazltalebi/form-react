@@ -3,14 +3,28 @@ import { useState } from "react";
 function Number() {
   const [number, setNumber] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [infoMessage, setInfoMessage] = useState("");
 
   const handleNumberChange = (event) => {
     const value = event.target.value;
-    const phoneNumberRegex = /^\d{13}$/;
-    setNumber(value);
-    setErrorMessage(
-      phoneNumberRegex.test(value) ? "" : "Invalid phone number (13 digits)"
-    );
+    const onlyDigitsRegex = /^\d*$/;
+    if (!onlyDigitsRegex.test(value)) {
+      setErrorMessage("Only digits are allowed");
+      setInfoMessage("");
+    } else {
+      setNumber(value);
+      setErrorMessage("");
+      const remainingChars = 11 - value.length;
+      if (remainingChars > 0) {
+        setInfoMessage(
+          `${remainingChars} ${remainingChars === 1 ? "digit" : "digits"}`
+        );
+      } else if (remainingChars === 0) {
+        setInfoMessage("Valid number");
+      } else {
+        setInfoMessage("");
+      }
+    }
   };
 
   return (
@@ -22,13 +36,19 @@ function Number() {
         id="numberInput"
         value={number}
         placeholder="+9890000000"
-        className={`p-2 rounded-xl shadow ${
-          number.length === 13 ? "border-2 border-green-500" : "bg-white/80"
+        className={`p-2 rounded-xl shadow focus:outline outline-gray-300 ${
+          number.length === 11 && !errorMessage
+            ? "border-2 border-green-500"
+            : "bg-white/80"
         }`}
         onChange={handleNumberChange}
       />
-      {errorMessage  && number.length>0 (
-        <p className="text-[12px] text-green-600">{errorMessage}</p>
+
+      {errorMessage && (
+        <p className="text-[12px] text-red-600">{errorMessage}</p>
+      )}
+      {infoMessage && !errorMessage && (
+        <p className="text-[12px] text-green-600">{infoMessage}</p>
       )}
     </div>
   );

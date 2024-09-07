@@ -26,7 +26,7 @@ function Email() {
         }`}
         onChange={handleChangeEmail}
       />
-      {isEmail && isEmail.length==0 && (
+      {isEmail && !email.length > 12 && (
         <p className="text-[12px] text-green-600">
           {isEmail ? "Valid Email" : "Invalid Email"}
         </p>

@@ -27,7 +27,7 @@ function Name() {
               please enter your name
             </span>
           ) : (
-            <span className="text-green-900 text-[12px]">
+            <span className="text-green-600 text-[12px]">
               Thank you, {names.trim()}.
             </span>
           )}
