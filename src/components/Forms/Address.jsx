@@ -21,12 +21,15 @@ function Address() {
       />
       {address && (
         <p>
-          {address.length == 0 ? (
+          {address.length == 0 && (
             <span className="text-red-600 text-[12px]">
-              please enter your name
+              please enter your address
             </span>
-          ) : (
-            <span className="text-green-600 text-[12px]">{address}</span>
+          )}
+          {address.length == 1 && (
+            <span className="text-green-600 text-[12px]">
+              thanck you
+            </span>
           )}
         </p>
       )}

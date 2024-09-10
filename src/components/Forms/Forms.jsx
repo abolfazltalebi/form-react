@@ -10,7 +10,7 @@ function Forms() {
     e.preventDefault();
   }
   return (
-    <main className="bg-white max-w-6xl p-4 rounded-xl container mx-auto mt-[150px]">
+    <main className="bg-white max-w-6xl p-4 rounded-xl container mx-auto mt-[20px]">
       <h2 className="text-center text-4xl">Validation Forms</h2>
       <form
         className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center "
@@ -25,6 +25,7 @@ function Forms() {
           <Zipcode />
         </div>
         <Buttons />
+        
       </form>
     </main>
   );

@@ -16,9 +16,10 @@ function Name() {
         name="name"
         placeholder="Enter your name"
         className={`p-2 shadow rounded-xl ${
-          names.length > 5 ? "border-2 border-green-700" : "bg-white/80"
+          names.length > 5 ? "border-2 border-green-500" : "bg-white/80"
         }`}
         onChange={handleNameChange}
+        required
       />
       {names && (
         <p>
