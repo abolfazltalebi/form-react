@@ -9,9 +9,19 @@ function App() {
     email: "",
     password: "",
     address: "",
-    zipecode: "",
+    zipcode: "",
   });
-
+  const [number, setNumber] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [infoMessage, setInfoMessage] = useState("");
+  const fieldTypes = {
+    name: "text",
+    email: "email",
+    password: "password",
+    address: "text",
+    zipcode: "text",
+  };
+  // handle input change
   function handleInputChange(e) {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -19,11 +29,13 @@ function App() {
       [name]: value,
     }));
   }
-
+  // handle submit
   function handleSubmit(e) {
     e.preventDefault();
     console.log(formData);
   }
+  // handle number
+
 
   return (
     <main className="bg-white max-w-6xl p-4 rounded-xl container mx-6 md:mx-auto m-auto mt-[20px]">
@@ -36,19 +48,21 @@ function App() {
           <ImageForm />
         </div>
         <div className="flex flex-col gap-4 mt-16">
-          {Object.keys(formData).map((item) => {
-            return (
-              <Input
-                key={item}
-                label={item}
-                type={item === "name" ? "text" : item}
-                name={item}
-                value={formData[item]}
-                onChange={handleInputChange}
-                placeholder={`enter your ${item}`}
-              />
-            );
-          })}
+          {Object.keys(formData).map((item) => (
+            <Input
+              key={item}
+              label={item}
+              type={fieldTypes[item]}
+              name={item}
+              value={formData[item]}
+              onChange={handleInputChange}
+              placeholder={`Enter your ${item}`}
+              number={number}
+              errorMessage={errorMessage}
+              infoMessage={infoMessage}
+              
+            />
+          ))}
         </div>
         <div className="flex flex-col items-center gap-6 justify-center my-6 col-span-4">
           <Buttons />
