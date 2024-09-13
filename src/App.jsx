@@ -34,8 +34,27 @@ function App() {
     e.preventDefault();
     console.log(formData);
   }
-  // handle number
-
+  const handleNumberChange = (event) => {
+    const value = event.target.value;
+    const onlyDigitsRegex = /^\d*$/;
+    if (!onlyDigitsRegex.test(value)) {
+      setErrorMessage("Only digits are allowed");
+      setInfoMessage("");
+    } else {
+      setNumber(value);
+      setErrorMessage("");
+      const remainingChars = 11 - value.length;
+      if (remainingChars > 0) {
+        setInfoMessage(
+          `${remainingChars} ${remainingChars === 1 ? "digit" : "digits"}`
+        );
+      } else if (remainingChars === 0) {
+        setInfoMessage("Valid number");
+      } else {
+        setInfoMessage("");
+      }
+    }
+  };
 
   return (
     <main className="bg-white max-w-6xl p-4 rounded-xl container mx-6 md:mx-auto m-auto mt-[20px]">
@@ -60,7 +79,6 @@ function App() {
               number={number}
               errorMessage={errorMessage}
               infoMessage={infoMessage}
-              
             />
           ))}
         </div>
