@@ -44,12 +44,7 @@ function Number() {
         onChange={handleNumberChange}
       />
 
-      {errorMessage && (
-        <p className="text-[12px] text-red-600">{errorMessage}</p>
-      )}
-      {infoMessage && !errorMessage && (
-        <p className="text-[12px] text-green-600">{infoMessage}</p>
-      )}
+    
     </div>
   );
 }

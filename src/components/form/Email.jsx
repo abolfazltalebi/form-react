@@ -1,16 +1,7 @@
 import { useState } from "react";
 
 function Email() {
-  const [email, setEmail] = useState("");
-  const [isEmail, setIsEmail] = useState("");
-  const handleChangeEmail = (event) => {
-    const valueInput = event.target.value;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setEmail(valueInput);
-    setIsEmail(
-      emailRegex.test(valueInput) ? "" : "Invalid phone number (13 digits)"
-    );
-  };
+ 
 
   return (
     <div className="flex flex-col gap-2">
