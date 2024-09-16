@@ -4,34 +4,33 @@ import ImageForm from "./components/form/ImageForm";
 import Input from "./components/Input";
 
 function App() {
-  // State for form data
-  const [formData, setFormData] = useState({
+  // State for individual form fields
+  const [formState, setFormState] = useState({
     name: "",
     email: "",
+    isEmailValid: true,
     number: "",
     address: "",
     zipcode: "",
+    errorMessage: "",
+    infoMessage: "",
+    errorMessageZip: "",
+    message: "",
   });
 
-  // State for individual form fields
-  const [names, setNames] = useState("");
-  const [email, setEmail] = useState("");
-  const [isEmail, setIsEmail] = useState("");
-  const [number, setNumber] = useState("");
-  const [address, setAddress] = useState("");
-  const [zipcode, setZipCode] = useState("");
-
-  // State for error and info messages
-  const [errorMessage, setErrorMessage] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
-  const [errorMessageZip, setErrorMessageZip] = useState("");
-  const [massage, setMassage] = useState("");
+  // Function to update form state
+  const updateFormState = (field, value) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
 
   // Field types for Input component
   const fieldTypes = {
     name: "text",
     email: "email",
-    number: "number",
+    number: "tel",
     address: "text",
     zipcode: "text",
   };
@@ -39,38 +38,22 @@ function App() {
   // Handle input change for form data
   function handleInputChange(e) {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setFormState((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    updateFormState(name, value);
   }
 
   // Handle form submission
-  function handleSubmit(e) {
-    e.preventDefault();
-    console.log(formData);
-  }
 
-  // Handle name input change
-  function handleNameChange(e) {
-    const value = e.target.value;
-    setNames(value);
-  }
 
   // Handle email input change
   function handleChangeEmail(event) {
-    const valueInput = event.target.value;
+    const value = event.target.value;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setEmail(valueInput);
-    setIsEmail(
-      emailRegex.test(valueInput) ? "" : "Invalid phone number (13 digits)"
-    );
-  }
-
-  // Handle address input change
-  function handleChangeAddress(e) {
-    const valueAddress = e.target.value;
-    setAddress(valueAddress);
+    updateFormState("email", value);
+    updateFormState("isEmailValid", emailRegex.test(value));
   }
 
   // Handle number input change
@@ -78,171 +61,182 @@ function App() {
     const value = event.target.value;
     const onlyDigitsRegex = /^\d*$/;
     if (!onlyDigitsRegex.test(value)) {
-      setErrorMessage("Only digits are allowed");
-      setInfoMessage("");
+      updateFormState("errorMessage", "Only numbers are allowed");
+      updateFormState("infoMessage", "");
     } else {
-      setNumber(value);
-      setErrorMessage("");
+      updateFormState("number", value);
+      updateFormState("errorMessage", "");
       const remainingChars = 11 - value.length;
       if (remainingChars > 0) {
-        setInfoMessage(
-          `${remainingChars} ${remainingChars === 1 ? "digit" : "digits"}`
-        );
+        updateFormState("infoMessage", `${remainingChars} more digits`);
       } else if (remainingChars === 0) {
-        setInfoMessage("Valid number");
+        updateFormState("infoMessage", "Valid number");
       } else {
-        setInfoMessage("");
+        updateFormState("infoMessage", "");
       }
     }
   };
 
   // Handle zipcode input change
   function handleZipCode(e) {
-    const valueZipCode = e.target.value;
-    const DigitsRegex = /^\d*$/;
-    if (!DigitsRegex.test(valueZipCode)) {
-      setErrorMessageZip("Only digits are allowed");
-      setMassage("");
+    const value = e.target.value;
+    const digitsRegex = /^\d*$/;
+    if (!digitsRegex.test(value)) {
+      updateFormState("errorMessageZip", "Only numbers are allowed");
+      updateFormState("message", "");
     } else {
-      setZipCode(valueZipCode);
-      setErrorMessageZip("");
-      const remainingChars = 11 - valueZipCode.length;
+      updateFormState("zipcode", value);
+      updateFormState("errorMessageZip", "");
+      const remainingChars = 10 - value.length;
       if (remainingChars > 0) {
-        setMassage(`
-          ${remainingChars} ${remainingChars === 1 ? "very good" : "good"}
-          `);
+        updateFormState("message", `${remainingChars} more digits`);
       } else if (remainingChars === 0) {
-        setMassage("Valid number");
+        updateFormState("message", "Valid postal code");
       } else {
-        setMassage("");
+        updateFormState("message", "");
       }
     }
   }
-
   return (
-    <main className="bg-white max-w-6xl p-4 rounded-xl container mx-6 md:mx-auto m-auto mt-[20px]">
+    <main className="bg-white max-w-6xl p-4 rounded-xl container mx-6 md:mx-auto m-auto mt-[5rem]">
       <h2 className="text-center text-4xl">Validation Forms</h2>
       <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center px-2 "
-        onSubmit={handleSubmit}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center px-2"
       >
         <div>
           <ImageForm />
         </div>
         <div className="flex flex-col gap-4 mt-16">
-          {/* Username input */}
+          {/* Username */}
           <div>
             <Input
-              label="userName:"
+              label="Username:"
               type={fieldTypes.name}
               name="name"
-              value={names}
-              placeholder={`Enter your UserName`}
-              onChange={handleNameChange}
+              value={formState.name}
+              placeholder="Enter your username"
+              onChange={handleInputChange}
               className={`p-2 shadow rounded-xl ${
-                names.length > 5 ? "border-2 border-green-500" : "bg-white/80"
+                formState.name.length > 5
+                  ? "border-2 border-green-500"
+                  : "bg-white/80"
               }`}
             />
-            {names && (
+            {formState.name && (
               <p>
-                {names.length == 0 ? (
+                {formState.name.length === 0 ? (
                   <span className="text-red-600 text-[12px]">
-                    please enter your name
+                    Please enter your name
                   </span>
                 ) : (
                   <span className="text-green-600 text-[12px]">
-                    Thank you, {names.trim()}.
+                    Thank you, {formState.name.trim()}.
                   </span>
                 )}
               </p>
             )}
           </div>
-          {/* Email input */}
+          {/* Email */}
           <div>
             <Input
-              label="email:"
+              label="Email:"
               type={fieldTypes.email}
               name="email"
-              value={email}
-              placeholder={`Enter your email`}
+              value={formState.email}
+              placeholder="Enter your email"
               onChange={handleChangeEmail}
               className={`p-2 rounded-xl shadow bg-white/80 ${
-                email.length > 12 ? "border-2 border-green-500" : "bg-white/80"
+                formState.email.length > 12
+                  ? "border-2 border-green-500"
+                  : "bg-white/80"
               }`}
             />
-            {isEmail && !email.length > 12 && (
-              <p className="text-[12px] text-green-600">
-                {isEmail ? "Valid Email" : "Invalid Email"}
+            {formState.email && (
+              <p
+                className={`text-[12px] ${
+                  formState.isEmailValid ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {formState.isEmailValid ? "Valid email" : "Invalid email"}
               </p>
             )}
           </div>
-          {/* Address input */}
+          {/* Address */}
           <div>
             <Input
-              label="addres:"
+              label="Address:"
               type={fieldTypes.address}
-              name="name"
-              value={address}
-              placeholder={`Enter your UserName`}
-              onChange={handleChangeAddress}
+              name="address"
+              value={formState.address}
+              placeholder="Enter your address"
+              onChange={handleInputChange}
               className={`p-2 rounded-xl shadow ${
-                address.length > 5 ? "border-2 border-green-600" : "bg-white/80"
+                formState.address.length > 5
+                  ? "border-2 border-green-600"
+                  : "bg-white/80"
               }`}
             />
-            {address && (
+            {formState.address && (
               <p>
-                {address.length == 0 && (
+                {formState.address.length === 0 ? (
                   <span className="text-red-600 text-[12px]">
-                    please enter your address
+                    Please enter your address
                   </span>
-                )}
-                {address.length == 1 && (
-                  <span className="text-green-600 text-[12px]">thanck you</span>
+                ) : (
+                  <span className="text-green-600 text-[12px]">Thank you</span>
                 )}
               </p>
             )}
           </div>
-          {/* Number input */}
+          {/* Phone number */}
           <div>
             <Input
-              label="number:"
+              label="Phone number:"
               type={fieldTypes.number}
               name="number"
-              value={number}
+              value={formState.number}
               onChange={handleNumberChange}
-              placeholder="+9890000000"
+              placeholder="09123456789"
               className={`p-2 rounded-xl shadow focus:outline outline-gray-300 ${
-                number.length === 11 && !errorMessage
+                formState.number.length === 11 && !formState.errorMessage
                   ? "border-2 border-green-500"
                   : "bg-white/80"
               }`}
             />
-            {errorMessage && (
-              <p className="text-[12px] text-red-600">{errorMessage}</p>
+            {formState.errorMessage && (
+              <p className="text-[12px] text-red-600">
+                {formState.errorMessage}
+              </p>
             )}
-            {infoMessage && !errorMessage && (
-              <p className="text-[12px] text-green-600">{infoMessage}</p>
+            {formState.infoMessage && !formState.errorMessage && (
+              <p className="text-[12px] text-green-600">
+                {formState.infoMessage}
+              </p>
             )}
           </div>
-          {/* Zipcode input */}
+          {/* Postal code */}
           <div>
             <Input
-              label="zipCode:"
+              label="Postal code:"
               type={fieldTypes.zipcode}
-              name="name"
-              value={zipcode}
-              placeholder={`Enter your zipcode`}
+              name="zipcode"
+              value={formState.zipcode}
+              placeholder="Enter your postal code"
               onChange={handleZipCode}
               className={`p-2 rounded-xl shadow focus:outline outline-gray-300 ${
-                zipcode.length === 11 && !errorMessage
+                formState.zipcode.length === 10 && !formState.errorMessageZip
                   ? "border-2 border-green-500"
                   : "bg-white/80"
               }`}
             />
-            {errorMessageZip && (
-              <p className="text-[12px] text-red-600">{errorMessageZip}</p>
+            {formState.errorMessageZip && (
+              <p className="text-[12px] text-red-600">
+                {formState.errorMessageZip}
+              </p>
             )}
-            {massage && <p className="text-[12px] text-green-600">{massage}</p>}
+            {formState.message && (
+              <p className="text-[12px] text-green-600">{formState.message}</p>
+            )}
           </div>
         </div>
         <div className="flex flex-col items-center gap-6 justify-center my-6 col-span-4">
