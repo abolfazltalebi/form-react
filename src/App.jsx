@@ -4,97 +4,96 @@ import ImageForm from "./components/form/ImageForm";
 import Input from "./components/Input";
 
 function App() {
-  // State for individual form fields
-  const [formState, setFormState] = useState({
-    name: "",
-    email: "",
-    isEmailValid: true,
-    number: "",
-    address: "",
-    zipcode: "",
-    errorMessage: "",
-    infoMessage: "",
-    errorMessageZip: "",
-    message: "",
-  });
-
-  // Function to update form state
-  const updateFormState = (field, value) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-  };
-
-  // Field types for Input component
   const fieldTypes = {
     name: "text",
     email: "email",
-    number: "tel",
-    address: "text",
-    zipcode: "text",
+    password: "password",
+    phone: "number",
   };
-
-  // Handle input change for form data
-  function handleInputChange(e) {
-    const { name, value } = e.target;
-    setFormState((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-    updateFormState(name, value);
-  }
-
-  // Handle form submission
-
-
-  // Handle email input change
-  function handleChangeEmail(event) {
-    const value = event.target.value;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    updateFormState("email", value);
-    updateFormState("isEmailValid", emailRegex.test(value));
-  }
-
-  // Handle number input change
-  const handleNumberChange = (event) => {
-    const value = event.target.value;
-    const onlyDigitsRegex = /^\d*$/;
-    if (!onlyDigitsRegex.test(value)) {
-      updateFormState("errorMessage", "Only numbers are allowed");
-      updateFormState("infoMessage", "");
-    } else {
-      updateFormState("number", value);
-      updateFormState("errorMessage", "");
-      const remainingChars = 11 - value.length;
-      if (remainingChars > 0) {
-        updateFormState("infoMessage", `${remainingChars} more digits`);
-      } else if (remainingChars === 0) {
-        updateFormState("infoMessage", "Valid number");
-      } else {
-        updateFormState("infoMessage", "");
-      }
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+  });
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+  });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  function validateName(name) {
+    let error = "";
+    const invalidChars = /[^a-zA-Z0-9]/;
+    if (name.length <= 5) {
+      error = "Your username must be more than 5 characters";
+    } else if (invalidChars.test(name)) {
+      error = "The username should only contain letters and numbers.";
     }
-  };
-
-  // Handle zipcode input change
-  function handleZipCode(e) {
-    const value = e.target.value;
-    const digitsRegex = /^\d*$/;
-    if (!digitsRegex.test(value)) {
-      updateFormState("errorMessageZip", "Only numbers are allowed");
-      updateFormState("message", "");
+    setErrors({ ...errors, name: error });
+  }
+  function validateEmail(email) {
+    let error = "";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      error = "The email format is not valid";
+    }
+    setErrors({ ...errors, email: error });
+  }
+  function validatePassword(password) {
+    let error = "";
+    let strength = "low";
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!strongPasswordRegex.test(password)) {
+      error =
+        "Password must be at least 8 characters long, include uppercase, lowercase letters, numbers, and special characters.";
     } else {
-      updateFormState("zipcode", value);
-      updateFormState("errorMessageZip", "");
-      const remainingChars = 10 - value.length;
-      if (remainingChars > 0) {
-        updateFormState("message", `${remainingChars} more digits`);
-      } else if (remainingChars === 0) {
-        updateFormState("message", "Valid postal code");
-      } else {
-        updateFormState("message", "");
-      }
+      strength = "strong";
+    }
+    setErrors({ ...errors, password: error });
+  }
+  function validatePhone(phone) {
+    let error = "";
+    const phoneRegex = /^[0-9]{10,13}$/;
+    if (!phoneRegex.test(phone)) {
+      error = "Phone number must be 10-13 digits";
+    }
+    setErrors({ ...errors, phone: error });
+  }
+  function handleChangeName(e) {
+    const { value } = e.target;
+    setFormData({ ...formData, name: value });
+    validateName(value);
+  }
+  function handleChangeEmail(e) {
+    const { value } = e.target;
+    setFormData({ ...formData, email: value });
+    validateEmail(value);
+  }
+  function handleChangePassword(e) {
+    const { value } = e.target;
+    setFormData({ ...formData, password: value });
+    validatePassword(value);
+  }
+  function handleChangePhone(e) {
+    const { value } = e.target;
+    setFormData({ ...formData, phone: value });
+    validatePhone(value);
+  }
+  // Handle form submission
+  function handleSubmit(e) {
+    e.preventDefault();
+    const hasErrors = Object.values(errors).some((error) => error !== "");
+    const allFieldsFilled = Object.values(formData).every(
+      (field) => field !== ""
+    );
+    if (!hasErrors && allFieldsFilled) {
+      setFormSubmitted(true);
+    } else {
+      setFormSubmitted(false);
+      alert("Please fill all fields correctly before submitting.");
     }
   }
   return (
@@ -102,6 +101,7 @@ function App() {
       <h2 className="text-center text-4xl">Validation Forms</h2>
       <form
         className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center px-2"
+        onSubmit={handleSubmit}
       >
         <div>
           <ImageForm />
@@ -113,134 +113,89 @@ function App() {
               label="Username:"
               type={fieldTypes.name}
               name="name"
-              value={formState.name}
+              value={formData.name}
               placeholder="Enter your username"
-              onChange={handleInputChange}
+              onChange={handleChangeName}
               className={`p-2 shadow rounded-xl ${
-                formState.name.length > 5
+                formData.name.length > 5 && !errors.name
                   ? "border-2 border-green-500"
-                  : "bg-white/80"
+                  : "bg-white/80 border-2 border-gray-200"
               }`}
             />
-            {formState.name && (
-              <p>
-                {formState.name.length === 0 ? (
-                  <span className="text-red-600 text-[12px]">
-                    Please enter your name
-                  </span>
-                ) : (
-                  <span className="text-green-600 text-[12px]">
-                    Thank you, {formState.name.trim()}.
-                  </span>
-                )}
+            {errors.name && (
+              <p className="text-red-700 text-sm mt-2 text-[12px]">
+                {errors.name}
               </p>
             )}
           </div>
-          {/* Email */}
+          {/* email */}
           <div>
             <Input
               label="Email:"
               type={fieldTypes.email}
-              name="email"
-              value={formState.email}
-              placeholder="Enter your email"
+              name="name"
+              value={formData.email}
+              placeholder="Enter your username"
               onChange={handleChangeEmail}
-              className={`p-2 rounded-xl shadow bg-white/80 ${
-                formState.email.length > 12
+              className={`p-2 shadow rounded-xl ${
+                !errors.email && formData.email
                   ? "border-2 border-green-500"
-                  : "bg-white/80"
+                  : "bg-white/80 border-2  border-gray-200"
               }`}
             />
-            {formState.email && (
-              <p
-                className={`text-[12px] ${
-                  formState.isEmailValid ? "text-green-600" : "text-red-500"
-                }`}
-              >
-                {formState.isEmailValid ? "Valid email" : "Invalid email"}
+            {errors.email && (
+              <p className="text-red-700 text-sm mt-2 text-[12px] ">
+                {errors.email}
               </p>
             )}
           </div>
-          {/* Address */}
+          {/* password */}
           <div>
             <Input
-              label="Address:"
-              type={fieldTypes.address}
-              name="address"
-              value={formState.address}
-              placeholder="Enter your address"
-              onChange={handleInputChange}
-              className={`p-2 rounded-xl shadow ${
-                formState.address.length > 5
-                  ? "border-2 border-green-600"
-                  : "bg-white/80"
+              label="Password:"
+              type={fieldTypes.password}
+              name="name"
+              value={formData.password}
+              placeholder="Enter your username"
+              onChange={handleChangePassword}
+              className={`p-2 shadow rounded-xl ${
+                !errors.password && formData.password
+                  ? "border-2 border-green-500"
+                  : "bg-white/80 border-2  border-gray-200"
               }`}
             />
-            {formState.address && (
-              <p>
-                {formState.address.length === 0 ? (
-                  <span className="text-red-600 text-[12px]">
-                    Please enter your address
-                  </span>
-                ) : (
-                  <span className="text-green-600 text-[12px]">Thank you</span>
-                )}
-              </p>
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-2">{errors.password}</p>
             )}
           </div>
-          {/* Phone number */}
+          {/* phone */}
           <div>
             <Input
-              label="Phone number:"
-              type={fieldTypes.number}
-              name="number"
-              value={formState.number}
-              onChange={handleNumberChange}
-              placeholder="09123456789"
-              className={`p-2 rounded-xl shadow focus:outline outline-gray-300 ${
-                formState.number.length === 11 && !formState.errorMessage
+              label="Phone:"
+              type={fieldTypes.phone}
+              name="name"
+              value={formData.phone}
+              placeholder="Enter your username"
+              onChange={handleChangePhone}
+              className={`p-2 shadow rounded-xl ${
+                !errors.phone && formData.phone
                   ? "border-2 border-green-500"
-                  : "bg-white/80"
+                  : "bg-white/80 border-2  border-gray-200"
               }`}
             />
-            {formState.errorMessage && (
-              <p className="text-[12px] text-red-600">
-                {formState.errorMessage}
-              </p>
-            )}
-            {formState.infoMessage && !formState.errorMessage && (
-              <p className="text-[12px] text-green-600">
-                {formState.infoMessage}
-              </p>
-            )}
-          </div>
-          {/* Postal code */}
-          <div>
-            <Input
-              label="Postal code:"
-              type={fieldTypes.zipcode}
-              name="zipcode"
-              value={formState.zipcode}
-              placeholder="Enter your postal code"
-              onChange={handleZipCode}
-              className={`p-2 rounded-xl shadow focus:outline outline-gray-300 ${
-                formState.zipcode.length === 10 && !formState.errorMessageZip
-                  ? "border-2 border-green-500"
-                  : "bg-white/80"
-              }`}
-            />
-            {formState.errorMessageZip && (
-              <p className="text-[12px] text-red-600">
-                {formState.errorMessageZip}
-              </p>
-            )}
-            {formState.message && (
-              <p className="text-[12px] text-green-600">{formState.message}</p>
+            {errors.phone && (
+              <p className="text-red-500 text-sm mt-2">{errors.phone}</p>
             )}
           </div>
         </div>
+        {/* Submit button */}
         <div className="flex flex-col items-center gap-6 justify-center my-6 col-span-4">
           <Buttons />
+          {formSubmitted && (
+            <p className="text-green-600 text-lg">
+              Form submitted successfully!
+            </p>
+          )}
         </div>
       </form>
     </main>
